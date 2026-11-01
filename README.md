@@ -6,7 +6,7 @@ Physical AI 応用1講座 最終課題「AI×ロボティクスによる創造�
 MuJoCo 上の Franka Panda ロボットアームが机の上の物体を認識・計画・把持・配置します。
 AI モデルはすべて **ローカル PC の CPU だけ**で動き、GPU やクラウド API は使いません（いずれも推論のみ）。
 
-- デモ動画: （YouTube の URL をここに記載）
+- デモ動画: https://youtu.be/T5Dioc5tBII
 - 説明資料: `docs/report.pdf`
 
 ![demo](docs/demo_frame.png)
