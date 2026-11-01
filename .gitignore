@@ -1,0 +1,14 @@
+# 仮想環境・キャッシュ (学習済みモデルは初回実行時に自動ダウンロード)
+.venv/
+.cache/
+__pycache__/
+*.pyc
+
+# 外部アセット (scripts/setup_assets.py で取得)
+third_party/
+
+# 生成物 (動画は YouTube で提出。サンプル画像のみ docs/ に置く)
+outputs/
+
+# 課題資料 (配布物のため公開リポジトリには含めない)
+最終課題*.pdf

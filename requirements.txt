@@ -1,0 +1,14 @@
+# PyTorch は CPU 版を推奨:
+#   pip install torch==2.14.1 torchvision==0.29.1 --index-url https://download.pytorch.org/whl/cpu
+torch==2.14.1
+torchvision==0.29.1
+mujoco==3.16.0
+transformers==4.57.6
+accelerate==1.15.0
+huggingface-hub==0.36.2
+hf-xet==1.7.0
+numpy==2.2.6
+pillow==12.3.0
+imageio==2.38.0
+imageio-ffmpeg==0.6.0
+matplotlib==3.10.9

@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>KotobaPick 説明資料</title>
+<style>
+  @page { size: A4; margin: 12mm 14mm 12mm 14mm; }
+  :root { --ink: #1d232c; --sub: #5b6676; --accent: #1f6fb2; --line: #d8dee6; --bg2: #f4f7fa;
+          --ok: #23854d; --mv: #b06a00; --arrow: #8a96a6; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { font-family: "BIZ UDPGothic", "BIZ UDGothic", "Yu Gothic", "Meiryo", sans-serif; color: var(--ink);
+         font-size: 9.5pt; line-height: 1.55; margin: 0; background: #fff; }
+  h1 { font-size: 17pt; margin: 0 0 .8mm; letter-spacing: .02em; }
+  h2 { font-size: 11.5pt; color: var(--accent); border-bottom: 1.6px solid var(--accent); padding-bottom: .5mm;
+       margin: 3.8mm 0 2mm; break-after: avoid; }
+  p { margin: 0 0 1.6mm; }
+  .lead { color: var(--sub); font-size: 9.6pt; margin-bottom: 2mm; }
+  .meta { display: grid; grid-template-columns: auto 1fr; gap: .3mm 3.5mm; font-size: 8.6pt; color: var(--sub);
+          border: 1px solid var(--line); background: var(--bg2); padding: 1.6mm 3.5mm; border-radius: 1.5mm; }
+  .meta b { color: var(--ink); }
+  .intro { display: grid; grid-template-columns: 1fr 96mm; gap: 4.5mm; align-items: start; }
+  figure { margin: 0; break-inside: avoid; }
+  figure img { width: 100%; display: block; border: 1px solid var(--line); border-radius: 1.2mm; }
+  figcaption { font-size: 8pt; color: var(--sub); margin-top: .8mm; line-height: 1.4; }
+  code { font-family: Consolas, "BIZ UDGothic", monospace; font-size: 8pt; background: var(--bg2);
+         padding: 0 .8mm; border-radius: .8mm; white-space: nowrap; }
+  .small { font-size: 8.5pt; color: var(--sub); line-height: 1.5; }
+
+  /* 処理の流れ (図2)。ボックス内の改行は <br> で指定する */
+  .flow { display: flex; align-items: stretch; margin: 1mm 0 .8mm; break-inside: avoid; }
+  .node { flex: 1 1 0; min-width: 0; border: 1.3px solid var(--line); border-radius: 1.6mm; background: #fff;
+          padding: 1.2mm .6mm; text-align: center; display: flex; flex-direction: column; justify-content: center; }
+  .node.wide { flex-grow: 1.3; }
+  .node b { display: block; font-size: 8.2pt; line-height: 1.3; white-space: nowrap; }
+  .node span { display: block; font-size: 7.2pt; color: var(--sub); line-height: 1.3; margin-top: .5mm; }
+  .node.ai { border-color: var(--accent); } .node.ai b { color: var(--accent); }
+  .node.mv { border-color: var(--mv); }     .node.mv b { color: var(--mv); }
+  .node.ck { border-color: var(--ok); }     .node.ck b { color: var(--ok); }
+  .arr { flex: 0 0 3mm; display: flex; align-items: center; justify-content: center; color: var(--arrow); font-size: 8.5pt; }
+  .loop { flex: 0 0 80mm; display: flex; flex-direction: column; border: 1.2px dashed var(--arrow);
+          border-radius: 2mm; padding: 1.1mm; background: var(--bg2); }
+  .loop-row { display: flex; flex: 1; }
+  .loop-label { font-size: 7.2pt; color: var(--sub); text-align: center; margin-top: .7mm; line-height: 1.2; }
+
+  /* 工夫した点 */
+  .point { border-left: 3.5px solid var(--accent); background: var(--bg2); padding: 1.6mm 3.5mm; margin: 0 0 2mm;
+           break-inside: avoid; }
+  .point b.t { color: var(--accent); }
+
+  table { border-collapse: collapse; width: 100%; font-size: 8.6pt; line-height: 1.45; margin: 0 0 2.2mm; break-inside: avoid; }
+  th, td { border: 1px solid var(--line); padding: .9mm 1.8mm; text-align: left; vertical-align: top; }
+  th { background: var(--bg2); font-weight: bold; }
+  td code { font-size: 7.6pt; }
+  .ok { color: var(--ok); font-weight: bold; }
+  ul { margin: 0 0 1.6mm; padding-left: 5mm; }
+  li { margin: .5mm 0; }
+  .credit { border-top: 1px solid var(--line); padding-top: 1.5mm; margin-top: 3mm; }
+</style>
+</head>
+<body>
+<!-- 全角文字の間の改行は印刷時に半角スペースとして出るため、段落内では改行しない -->
+
+<h1>KotobaPick — 言葉で動くお片付けロボット</h1>
+<div class="lead">Physical AI 応用1講座 最終課題「AI×ロボティクスによる創造的タスクの実現」説明資料</div>
+
+<div class="meta">
+  <b>シミュレータ</b><span>MuJoCo 3.16 / Franka Panda（7軸アーム＋平行グリッパ）</span>
+  <b>使用AI</b><span>Grounding DINO tiny（物体検出）・Qwen2.5-3B-Instruct（LLM）。いずれも推論のみ</span>
+  <b>実行環境</b><span>ノートPCのCPUのみ（GPU・クラウドAPI不使用）</span>
+  <b>動画</b><span>2分35秒（シナリオ2〜4のロボット動作は2倍速。画面右上に表示）</span>
+</div>
+
+<h2>1. 課題の概要と目的</h2>
+<div class="intro">
+  <div>
+    <p>「丸いものは全部お皿に、ブロックは全部木箱に片付けて」のような<b>日本語の指示だけ</b>で、机の上の物を認識し、手順を考え、掴んで片付けるロボットを作りました。対象物の位置・向きは<b>カメラ画像（RGB-D）から推定</b>し、どの物をどこへ運ぶかは<b>指示文から LLM が決めます</b>。シミュレータが持つ物体の真値は、シーンの生成・デモ用の外乱の注入・精度評価にだけ使っています。</p>
+    <p><b>目的</b>は、言葉で頼める家庭・介護・物流向けロボットの基本機能（見る・考える・動く・確かめる）を、公開 AI モデルの推論だけで一通りつなげ、実際に動く形で示すことです。AI はすべて手元の CPU で動かし、画像や会話を外部に送らない構成にしました。</p>
+  </div>
+  <figure>
+    <img src="demo_frame.png" alt="デモ動画の画面">
+    <figcaption>図1 デモ動画の画面（左: ロボットの動作、右上: 物体検出の結果、右下: LLM の計画と進み具合、下: 指示と処理の説明）</figcaption>
+  </figure>
+</div>
+
+<h2>2. システム構成</h2>
+<div class="flow">
+  <div class="node"><b>日本語の指示</b><span>「丸いものは<br>全部お皿に…」</span></div>
+  <div class="arr">→</div>
+  <div class="node ai"><b>① シーン認識</b><span>Grounding<br>DINO＋深度</span></div>
+  <div class="arr">→</div>
+  <div class="node ai"><b>② タスク計画</b><span>Qwen2.5-3B<br>何を → どこへ</span></div>
+  <div class="arr">→</div>
+  <div class="loop">
+    <div class="loop-row">
+      <div class="node ai"><b>③ 再認識</b><span>対象と置き場所<br>を探し直す</span></div>
+      <div class="arr">→</div>
+      <div class="node mv wide"><b>④⑤ 把持・配置</b><span>IK＋<br>最小躍度軌道</span></div>
+      <div class="arr">→</div>
+      <div class="node ck"><b>⑥ 結果確認</b><span>位置・高さ・<br>グリッパ開度</span></div>
+    </div>
+    <div class="loop-label">手順ごとに繰り返し、失敗したら③からやり直す</div>
+  </div>
+  <div class="arr">→</div>
+  <div class="node ck"><b>⑦ 最終確認</b><span>全手順の結果を<br>撮り直して確認</span></div>
+</div>
+<p class="small">図2 処理の流れ（青: AI による認識・計画、橙: 動作生成、緑: 画像による確認）。LLM に渡すのは画像ではなく、①の認識結果（物体のラベルと「left」などの大まかな位置）と指示文です。実行順（土台になる物を先に動かす）、把持・配置の動作、容器内の置き場所の選び方はプログラムで定義しています。該当する物体がない指示や不正な計画では、ロボットは動かずにその旨を報告します。</p>
+
+<h2>3. 工夫した点</h2>
+<div class="point"><b class="t">① 検出器を比較して選び、問い合わせ方を工夫</b><br>最初に試した OWLv2 は、緑のブロックを「青いブロック」と判定するなど色の識別が弱く、木箱・皿も検出できませんでした（同じ画像で正しいラベル 4/7）。Grounding DINO に切り替えると 7/7 を正しく判別できました。さらに、候補語を毎回すべて並べて「競わせる」問い合わせ方にし、シーンに無い候補には green cylinder のような紛らわしい語ではなく banana など意味の離れた日用品を使うことで、誤ラベルをなくしました（6シーンで 41/42 → 42/42）。</div>
+<div class="point"><b class="t">② 小型 LLM を確実に使うための問題分解</b><br>CPU で動く小型 LLM に、指示と物体リストから計画を一度に書かせると、「丸いもの」にブロックを含める、物体を取りこぼす、直前に書いた行き先を繰り返すといった誤りが頻発しました。そこで、(1) 指示を「何を → どこへ」の規則に言い換える、(2) 規則に当てはまる物体を選ぶ、の2段階に分けました。(2) では、名前で決まる説明句（「ブロック」「赤いブロック」）はプログラムで照合し、「一番左のもの」のように位置で決まるものだけを、物体ごとに LLM の yes / no で判定します（block と cube などの同義語はコードで正規化）。同じ12問で、Qwen2.5-3B の正解は<b>一括生成 4/12 → 分解方式 12/12</b>、1.5B でも 5/12 → 10/12 に上がりました。一方、一括生成のままモデルを 1.5B から 3B に大きくしても正解率は上がらず（5/12 → 4/12）、改善の主因はモデルの大きさではなく問い方の設計でした。</div>
+<div class="point"><b class="t">③ 閉ループ化：「見てから動く」「動いた後に確かめる」</b><br>各手順の直前に対象と置き場所を撮り直して再認識し、置いた後は位置と高さ（容器の縁や他の物への乗り上げ）で成否を画像から確認します。掴み損ね・搬送中の落下はグリッパ開度で検知して再試行し、全手順の後にも最終確認を行います。動画のシナリオ4では、落下と「人が物を動かす」外乱をスクリプトで注入し、その検知と回復をロボットが自律的に行うことを示しました（閉ループは手順単位で、動作中の視覚フィードバックはありません）。</div>
+<div class="point"><b class="t">④ AI の「考え」が見える動画</b><br>検出ボックスと信頼度、LLM の計画と各手順の状態（実行中・成功・再試行）、推定した把持位置、処理段階の説明を1画面にまとめました。CPU 推論の待ち時間は動画では短縮していますが、実際の推論時間は画面に表示しています。</div>
+<div class="point"><b class="t">⑤ PC 環境を汚さない構成</b><br>パッケージはプロジェクト内の仮想環境、学習済みモデルはプロジェクト内の <code>.cache/</code> に置き、システムの Python や PATH は変更していません。Windows の MuJoCo が日本語のフォルダ名を開けない問題は、モデルファイルをメモリ経由で読み込んで回避しました。</div>
+
+<h2>4. 結果</h2>
+<table>
+  <tr><th style="width:17%">シナリオ</th><th>指示 → LLM の理解（構造化の結果）</th><th style="width:33%">結果（最終確認）</th></tr>
+  <tr><td>1 基本</td><td>「赤いブロックを木箱に入れて」<br><code>the red cube → wooden box</code></td><td><span class="ok">1/1 達成</span>（再試行なし）</td></tr>
+  <tr><td>2 積み上げ</td><td>「緑のブロックを青いブロックの上に積んで」<br><code>the green cube → on the blue cube</code></td><td><span class="ok">1/1 達成</span>（土台の高さを深度から推定）</td></tr>
+  <tr><td>3 抽象的・複合的</td><td>「丸いものは全部お皿に、ブロックは全部木箱に片付けて」<br><code>[balls, cylinders] → white plate</code>　<code>[cubes] → wooden box</code></td><td><span class="ok">5/5 達成</span>（すべて1回目で成功）</td></tr>
+  <tr><td>4 外乱からの回復</td><td>「ブロックを全部お皿に集めて」<br><code>[cubes] → white plate</code></td><td><span class="ok">3/3 達成</span>（落下を検知して1回再試行、動かされた物体にも再認識で追従）</td></tr>
+  <tr><td>5 できない指示</td><td>「紫のブロックを木箱に入れて」<br><code>the purple cube → wooden box</code>（該当する物体なし）</td><td>計画なしと判断し、動かずに報告</td></tr>
+</table>
+<table>
+  <tr><th style="width:28%">評価</th><th>結果</th></tr>
+  <tr><td>認識精度（ランダム配置10シーン）</td><td>ラベル <span class="ok">70/70</span> 正解、水平位置の誤差 平均 4.3 mm（最大 7.0 mm）、ブロックの向きの誤差 平均 3.1°（真値は評価にのみ使用）</td></tr>
+  <tr><td>計画の正解率（指示12種）</td><td>Qwen2.5-3B: 一括生成 4/12 → 分解方式 <span class="ok">12/12</span>、Qwen2.5-1.5B: 5/12 → 10/12（12問中10問は開発中に使った問題）</td></tr>
+  <tr><td>推論時間（CPU）</td><td>物体検出 12〜15 秒/回、LLM による計画 20〜101 秒/回（動画では待ち時間を短縮）</td></tr>
+</table>
+
+<h2>5. 考察と今後の課題</h2>
+<ul>
+  <li><b>推論速度</b>: GPU を使わない CPU 推論のため、実時間で動かすには GPU の利用、モデルの量子化、検出の高速化が必要です。</li>
+  <li><b>LLM の理解力</b>: 評価は12問と小規模で、うち10問は開発に使った問題のため、未知の言い回しでは誤る可能性があります。曖昧な指示を聞き返す対話機能や、視覚言語モデルの利用が考えられます。</li>
+  <li><b>環境と動作の単純さ</b>: 物体は単色の単純形状で、深度画像にノイズがありません。同じラベルの物体が複数ある場面、真上以外からの把持、経路の衝突検査には未対応です。</li>
+  <li><b>実機への展開</b>: 認識・計画・動作の各部を ROS 2 のノードに置き換えやすい構成にしてあり、次は SO-101 などの安価なアームと RGB-D カメラで同じパイプラインを試したいと考えています。</li>
+</ul>
+
+<p class="small credit"><b>使用モデル・アセット</b>: Grounding DINO tiny（Apache-2.0）、Qwen2.5-3B-Instruct（Qwen Research License、非商用の学習目的で使用）、比較用に Qwen2.5-1.5B-Instruct と OWLv2（Apache-2.0）、ロボットモデルは MuJoCo Menagerie の Franka Panda（Apache-2.0）。<b>コード</b>: GitHub リポジトリ（README にセットアップと再現の手順を記載）。</p>
+
+</body>
+</html>
